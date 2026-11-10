@@ -1,0 +1,10 @@
+{
+  "tasks": [
+    {
+      "text": "lavar",
+      "completed": true,
+      "id": "e6YlOyZkKp8"
+    }
+  ],
+  "$schema": "./node_modules/json-server/schema.json"
+}

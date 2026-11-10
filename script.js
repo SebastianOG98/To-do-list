@@ -1,3 +1,5 @@
+import { fetchService } from "./fetchService.js";
+
 const btnAdd = document.getElementById("btnAddTask");
 const inputTask = document.getElementById("addTask");
 const list = document.getElementById("taskList");
@@ -17,43 +19,42 @@ const updateCounters = () => {
     pendingCount.textContent = pending;
 };
 
-const saveTasksToLocalStorage = () => {
-    const tasks = [];
-    const taskItems = list.querySelectorAll("li");
-    taskItems.forEach((item) => {
-        // Obtenemos únicamente el nodo de texto de la tarea (ignorando el botón)
-        const textNode = Array.from(item.childNodes).find(node => node.nodeType === Node.TEXT_NODE);
-        const textTask = textNode ? textNode.textContent.trim() : "";
-        const isCompleted = item.classList.contains("completed");
-        tasks.push({ text: textTask, completed: isCompleted });
-    });
-    localStorage.setItem("tasks", JSON.stringify(tasks));
-    updateCounters();
-};
-
-const createElementTask = (text, isCompleted = false) => {
+const createElementTask = (taskObj) => {
+    const { id, text, completed } = taskObj;
+    
     const newTask = document.createElement("li");
     newTask.textContent = text;
+    newTask.dataset.id = id; // Guardamos el ID de la base de datos en el elemento DOM
 
-    if (isCompleted) {
+    if (completed) {
         newTask.classList.add("completed");
     }
 
-    newTask.addEventListener("click", (e) => {
+    // Evento para alternar estado completado
+    newTask.addEventListener("click", async (e) => {
         if (e.target.tagName !== "BUTTON") {
+            const isNowCompleted = !newTask.classList.contains("completed");
+            
+            // Actualizamos en la base de datos
+            await fetchService.updateTask(id, { completed: isNowCompleted });
+            
             newTask.classList.toggle("completed");
-            saveTasksToLocalStorage();
+            updateCounters();
         }
     });
 
     const deleteBtn = document.createElement("button");
     deleteBtn.textContent = "Eliminar";
-    deleteBtn.addEventListener("click", () => {
-        newTask.classList.add("fade-out");
-        setTimeout(() => {
-            newTask.remove();
-            saveTasksToLocalStorage();
-        }, 300);
+    deleteBtn.addEventListener("click", async () => {
+        // Eliminamos de la base de datos
+        const success = await fetchService.deleteTask(id);
+        if (success) {
+            newTask.classList.add("fade-out");
+            setTimeout(() => {
+                newTask.remove();
+                updateCounters();
+            }, 300);
+        }
     });
 
     newTask.appendChild(deleteBtn);
@@ -61,20 +62,16 @@ const createElementTask = (text, isCompleted = false) => {
     updateCounters();
 };
 
-const loadTask = () => {
-    const taskSaved = localStorage.getItem("tasks");
-    if (taskSaved) {
-        const tasks = JSON.parse(taskSaved);
-        tasks.forEach((taskObj) => {
-            const text = typeof taskObj === "string" ? taskObj : taskObj.text;
-            const completed = typeof taskObj === "object" ? taskObj.completed : false;
-            createElementTask(text, completed);
-        });
-    }
+const loadTasks = async () => {
+    list.innerHTML = ""; // Limpiamos la lista visual antes de cargar
+    const tasks = await fetchService.getTasks();
+    tasks.forEach((taskObj) => {
+        createElementTask(taskObj);
+    });
     updateCounters();
 };
 
-const addTask = () => {
+const addTask = async () => {
     const inputTaskValue = inputTask.value.trim();
     
     if (inputTaskValue === "") {
@@ -82,16 +79,26 @@ const addTask = () => {
         return;
     }
 
-    createElementTask(inputTaskValue, false);
-    saveTasksToLocalStorage();
-    inputTask.value = "";
+    const newTaskData = {
+        text: inputTaskValue,
+        completed: false
+    };
+
+    // Guardar en la base de datos y obtener el objeto creado con su ID
+    const savedTask = await fetchService.createTask(newTaskData);
+    
+    if (savedTask) {
+        createElementTask(savedTask);
+        inputTask.value = "";
+    }
 };
 
-loadTask();
+// Cargar tareas al iniciar la aplicación
+loadTasks();
 
 btnAdd.addEventListener("click", addTask);
 
-inputTask.addEventListener("keydown", (event) => {
+inputTask.addEventListener("keydown", async (event) => {
     if (event.key === "Enter") {
         addTask();
     }
@@ -99,11 +106,15 @@ inputTask.addEventListener("keydown", (event) => {
     if (event.key === "Delete" && inputTask.value === "") {
         const lastTask = list.lastElementChild;
         if (lastTask) {
-            lastTask.classList.add("fade-out");
-            setTimeout(() => {
-                lastTask.remove();
-                saveTasksToLocalStorage();
-            }, 300);
+            const id = lastTask.dataset.id;
+            const success = await fetchService.deleteTask(id);
+            if (success) {
+                lastTask.classList.add("fade-out");
+                setTimeout(() => {
+                    lastTask.remove();
+                    updateCounters();
+                }, 300);
+            }
         }
     }
 });
