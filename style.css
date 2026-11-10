@@ -149,3 +149,40 @@ h1 {
 .fade-out {
     animation: fadeOut 0.3s ease forwards;
 }
+
+#taskList li.completed {
+    background: #edf2f7;
+    opacity: 0.7;
+    border-left-color: #a0aec0;
+    text-decoration: line-through;
+    color: #718096;
+}
+
+.counters {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.85rem;
+    color: #4a5568;
+    margin-bottom: 15px;
+    padding: 0 5px;
+}
+
+.keyboard-hint {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.75rem;
+    color: #718096;
+    margin-bottom: 15px;
+    padding: 0 5px;
+}
+
+.keyboard-hint kbd {
+    background-color: #edf2f7;
+    border: 1px solid #cbd5e0;
+    border-radius: 4px;
+    padding: 2px 5px;
+    font-family: inherit;
+    font-weight: 600;
+    color: #4a5568;
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.05);
+}
