@@ -1,0 +1,151 @@
+/* --- RESET GENERAL --- */
+/* Esto elimina márgenes y rellenos extraños que los navegadores traen por defecto */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box; /* Esto hace que el padding no 'agrande' el ancho de los elementos */
+}
+
+/* --- VARIABLES DE COLOR --- */
+/* Definimos los colores que usaremos para no tener que escribir los códigos hexadecimales cada vez */
+:root {
+    --color-fondo-inicio: #667eea; /* Azul violáceo */
+    --color-fondo-fin: #764ba2;    /* Morado profundo */
+    --color-primario: #7e3af2;     /* Morado del botón Agregar */
+    --color-primario-hover: #6c2bd9; /* Morado más oscuro para el hover */
+    --color-gris-claro: #f7fafc;   /* Fondo de las tareas */
+    --color-texto: #333;           /* Color de texto principal */
+    --color-eliminar: #feb2b2;     /* Fondo pastel del botón eliminar */
+    --color-eliminar-texto: #9b2c2c; /* Texto del botón eliminar */
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(to right, var(--color-fondo-inicio), var(--color-fondo-fin));
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: var(--color-texto);
+}
+
+.container {
+    background: #ffffff;
+    padding: 30px;
+    border-radius: 16px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    width: 100%;
+    max-width: 400px;
+}
+
+h1 {
+    font-size: 1.6rem;
+    margin-bottom: 20px;
+    text-align: center;
+    color: #081428;
+    font-family:'Times New Roman', Times, serif;
+}
+
+.input-container {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+#addTask {
+    flex: 1;
+    padding: 12px 15px;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 1rem;
+    outline: none;
+    transition: border-color 0.3s;
+}
+
+#btnAddTask {
+    padding: 12px 20px;
+    background-color: var(--color-fondo-inicio);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.2s, transform 0.1s;
+}
+
+#btnAddTask:hover {
+    background-color: var(--color-primario-hover);
+}
+
+#btnAddTask:active {
+    transform: scale(0.95);
+}
+
+
+#taskList {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-height: 300px;
+    overflow-y: auto; /* Permite hacer scroll si tienes muchas tareas */
+}
+
+
+#taskList li {
+    background: var(--color-gris-claro);
+    padding: 12px 15px;
+    border-radius: 8px;
+    border-left: 4px solid var(--color-fondo-inicio);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.95rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    animation: fadeIn 0.3s ease;
+}
+
+
+#taskList li button {
+    background-color: var(--color-eliminar);
+    color: var(--color-eliminar-texto);
+    border: none;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+#taskList li button:hover {
+    background-color: #fc8181;
+    color: white;
+}
+
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-5px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeOut {
+    from {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    to {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+}
+
+.fade-out {
+    animation: fadeOut 0.3s ease forwards;
+}
